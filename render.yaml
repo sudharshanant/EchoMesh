@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: echomesh
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: sh -c 'streamlit run echomesh_app.py --server.headless true --server.address 0.0.0.0 --server.port ${PORT:-8502}'
+    autoDeploy: true
+    envVars:
+      - key: ECHO_DATA_FILE
+        value: /tmp/local_requests.json
+      - key: FIREBASE_KEY_PATH
+        value: /etc/secrets/serviceAccountKey.json
+      - key: FIREBASE_DATABASE_URL
+        sync: false

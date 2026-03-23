@@ -1,0 +1,10 @@
+{
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "sh -c 'streamlit run echomesh_app.py --server.headless true --server.address 0.0.0.0 --server.port ${PORT:-8502}'",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
+}

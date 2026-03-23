@@ -1,0 +1,34 @@
+{
+  "1": {
+    "lat": 13.0827,
+    "lon": 80.2707,
+    "message": "Person injured in building collapse",
+    "priority": "HIGH",
+    "status": "Pending",
+    "team": "Not Assigned",
+    "chat": [],
+    "timestamp": "2026-02-24T23:10:16.889237"
+  },
+  "2": {
+    "lat": 13.085,
+    "lon": 80.275,
+    "message": "Urgent medical help needed",
+    "priority": "HIGH",
+    "status": "Assigned",
+    "team": "Rescue_2",
+    "chat": [
+      "Rescue: ETA 5 minutes"
+    ],
+    "timestamp": "2026-02-24T23:10:16.889237"
+  },
+  "3": {
+    "lat": 13.08,
+    "lon": 80.265,
+    "message": "Help needed immediately",
+    "priority": "MEDIUM",
+    "status": "Pending",
+    "team": "Not Assigned",
+    "chat": [],
+    "timestamp": "2026-02-24T23:10:16.889237"
+  }
+}
