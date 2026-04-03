@@ -5,6 +5,7 @@ EchoMesh is a Streamlit-based emergency coordination prototype with:
 - Rescue team dashboard
 - Local JSON persistence fallback
 - Optional Firebase Realtime Database support
+- **AI-powered reliability prediction and route optimization**
 
 ## Quick Start (Local)
 
@@ -34,6 +35,16 @@ To enable Firebase storage:
 - Set `FIREBASE_DATABASE_URL` in your environment.
 
 If Firebase is not configured, the app automatically uses `local_requests.json`.
+
+## AI Features
+
+EchoMesh includes trained AI models for:
+- **Device Reliability Prediction**: Predicts if rescue team devices may fail based on battery, location, and network factors
+- **Route Optimization**: Estimates optimal routing costs for emergency response coordination
+
+Models are trained on synthetic data simulating mesh network conditions. To retrain models:
+1. Run `python generate_training_data.py` to create new training data
+2. Run `python train_model.py` to train the neural networks
 
 ## Environment Variables
 

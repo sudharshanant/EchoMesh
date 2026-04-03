@@ -47,7 +47,7 @@ class DeviceDataset(Dataset):
         return len(self.features)
 
     def __getitem__(self, idx):
-        return torch.tensor(self.features[idx], dtype=torch.float32), torch.tensor(self.labels[idx], dtype=torch.float32 if self.task == 'optimization' else torch.long)
+        return torch.tensor(self.features[idx], dtype=torch.float32), torch.tensor(self.labels[idx], dtype=torch.float32)
 
 class BigNeuralNetwork(nn.Module):
     def __init__(self, input_size, output_size, task='prediction'):
