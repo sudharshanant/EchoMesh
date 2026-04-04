@@ -5,7 +5,9 @@ import math
 import pydeck as pdk
 import json
 import os
+import random
 from datetime import datetime
+from ai_model import ai_model
 
 # ---------------- FIREBASE SETUP ----------------
 
@@ -279,7 +281,89 @@ if menu == "Rescue Dashboard":
     st.subheader("📊 All SOS Requests")
     st.dataframe(df[['message', 'priority', 'status', 'team', 'lat', 'lon']], use_container_width=True)
 
-    # ---------- MAP WITH ROUTES ----------
+    # ---------- GENERATE TEAM DATA WITH AI PREDICTIONS ----------
+
+    tasks = [
+        "Search Operation",
+        "Medical Assistance",
+        "Evacuation Support",
+        "Supply Distribution",
+        "Damage Assessment"
+    ]
+
+    statuses = ["Active", "In Transit", "Idle", "Emergency"]
+
+    ai_teams = []
+
+    for i in range(1, 11):
+        lat = BASE_LAT + random.uniform(-0.01, 0.01)
+        lon = BASE_LON + random.uniform(-0.01, 0.01)
+        battery = random.randint(40, 100)
+        signal_strength = random.uniform(0.5, 1.0)
+        distance_from_base = np.sqrt((lat - BASE_LAT)**2 + (lon - BASE_LON)**2)
+        num_neighbors = random.randint(1, 5)
+        avg_neighbor_battery = random.randint(40, 100)
+        active_neighbors = random.randint(1, num_neighbors)
+
+        # AI Predictions
+        will_fail = ai_model.predict_device_failure(
+            lat, lon, battery, signal_strength, distance_from_base,
+            num_neighbors, avg_neighbor_battery, active_neighbors
+        )
+        path_cost = ai_model.predict_path_cost(
+            lat, lon, battery, signal_strength, distance_from_base,
+            num_neighbors, avg_neighbor_battery, active_neighbors
+        )
+
+        team = {
+            "Team": f"Rescue Team {i}",
+            "Latitude": round(lat, 6),
+            "Longitude": round(lon, 6),
+            "Task": random.choice(tasks),
+            "Status": random.choice(statuses),
+            "Battery (%)": battery,
+            "AI Reliability": "High" if not will_fail else "Low",
+            "AI Route Cost": round(path_cost, 2) if path_cost else "N/A"
+        }
+        ai_teams.append(team)
+
+    ai_df = pd.DataFrame(ai_teams)
+
+    # ---------- AI TEAM STATUS TABLE ----------
+
+    st.subheader("📋 Rescue Teams - AI Enhanced")
+    st.dataframe(ai_df, use_container_width=True)
+
+    # ---------- AI INSIGHTS ----------
+
+    st.subheader("🤖 AI Insights & Optimization")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("**Reliability Analysis:** Teams with 'Low' reliability may need battery checks or repositioning.")
+
+    with col2:
+        st.markdown("**Route Optimization:** Lower AI Route Cost indicates better positioning for emergency response.")
+
+    low_reliability_teams = [team for team in ai_teams if team["AI Reliability"] == "Low"]
+    if low_reliability_teams:
+        st.warning(f"⚠️ Low Reliability Alert: {', '.join([t['Team'] for t in low_reliability_teams])} require attention")
+    else:
+        st.success("✅ All teams have high reliability")
+
+    # ---------- SYSTEM ALERTS ----------
+
+    st.subheader("🚨 System Alerts")
+
+    emergency_teams = [team for team in ai_teams if team["Status"] == "Emergency"]
+    if emergency_teams:
+        for team in emergency_teams:
+            st.error(f"🚨 {team['Team']} ({team['Task']}) is in EMERGENCY status - requires immediate support!")
+    else:
+        st.info("✓ No emergency alerts")
+
+    st.divider()
 
     st.subheader("🛰 Emergency Map - Real-time Tracking")
 
@@ -301,11 +385,11 @@ if menu == "Rescue Dashboard":
 
     for i, row in df.iterrows():
 
-        team = teams[0]
+        team = ai_teams[0]  # Use first AI team for routing
 
         route_data.append({
             "path": [
-                [team["lon"], team["lat"]],
+                [team["Longitude"], team["Latitude"]],
                 [row["lon"], row["lat"]]
             ]
         })
@@ -322,14 +406,14 @@ if menu == "Rescue Dashboard":
             get_color=[0, 255, 0],
         )
     )
-    
+
     # Add rescue team locations
-    teams_df = pd.DataFrame(teams)
+    teams_for_map = pd.DataFrame(ai_teams)
     layers.append(
         pdk.Layer(
             "ScatterplotLayer",
-            teams_df,
-            get_position='[lon, lat]',
+            teams_for_map,
+            get_position='[Longitude, Latitude]',
             get_fill_color="[0, 100, 255]",
             get_radius=120,
         )
@@ -376,9 +460,9 @@ if menu == "Rescue Dashboard":
 
     st.subheader("🚑 Assign Team")
 
-    cols = st.columns(len(teams))
+    cols = st.columns(len(ai_teams))
 
-    for i, team in enumerate(teams):
+    for i, team in enumerate(ai_teams):
 
         if cols[i].button(team["Team"]):
 
@@ -394,10 +478,10 @@ if menu == "Rescue Dashboard":
 
     # ---------- DISTANCE ----------
 
-    team = teams[0]
+    team = ai_teams[0]
 
     dist = calculate_distance(
-        team["lat"], team["lon"],
+        team["Latitude"], team["Longitude"],
         req["lat"], req["lon"]
     )
 
